@@ -1,55 +1,51 @@
 const BASE_URL = "https://phimapi.com";
+let currentPage = 1;
 
-// 1. Lấy danh sách phim mới cập nhật từ KKPhim
-async function getMovies() {
+// 1. Lấy danh sách phim theo số trang (Dùng để làm nút chuyển trang)
+async function getMovies(page = 1) {
   try {
-    const res = await fetch(`${BASE_URL}/danh-sach/phim-moi-cap-nhat?page=1`);
+    const res = await fetch(`${BASE_URL}/danh-sach/phim-moi-cap-nhat?page=${page}`);
     const data = await res.json();
     
-    // Gọi hàm hiển thị danh sách phim ra màn hình
-    renderMovies(data.items);
+    if (data.items) {
+      renderMovies(data.items);
+      renderPagination(data.pagination); // Tạo nút chuyển trang
+    }
   } catch (error) {
     console.error("Lỗi tải danh sách phim:", error);
   }
 }
 
-// 2. Hàm vẽ danh sách phim ra giao diện HTML
+// 2. Hàm vẽ danh sách phim dạng lưới
 function renderMovies(movies) {
-  // Tìm container chứa phim trên trang (ưu tiên id="rows" hoặc thẻ main)
   const container = document.getElementById("rows") || document.querySelector("main");
   if (!container) return;
 
-  container.innerHTML = ""; // Xóa nội dung cũ (nếu có)
-  container.style.display = "flex";
-  container.style.flexWrap = "wrap";
+  container.innerHTML = "";
+  container.style.display = "grid";
+  container.style.gridTemplateColumns = "repeat(auto-fill, minmax(180px, 1fr))";
   container.style.gap = "20px";
   container.style.padding = "20px";
-  container.style.justifyContent = "center";
 
   movies.forEach(movie => {
-    // Xử lý đường dẫn ảnh poster từ KKPhim
     let imageUrl = movie.poster_url;
     if (imageUrl && !imageUrl.startsWith('http')) {
       imageUrl = `https://img.phimapi.com/${imageUrl}`;
     }
 
-    // Tạo thẻ chứa từng bộ phim
     const card = document.createElement("div");
-    card.style.width = "180px";
     card.style.cursor = "pointer";
     card.style.transition = "transform 0.2s";
     
     card.innerHTML = `
       <img src="${imageUrl}" alt="${movie.name}" style="width: 100%; height: 260px; object-fit: cover; border-radius: 8px;">
-      <h4 style="color: white; font-size: 14px; margin: 8px 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${movie.name}</h4>
-      <p style="color: #aaa; font-size: 12px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${movie.origin_name}</p>
+      <h4 style="color: white; font-size: 14px; margin: 8px 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${movie.name}">${movie.name}</h4>
+      <p style="color: #aaa; font-size: 12px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${movie.origin_name}">${movie.origin_name}</p>
     `;
 
-    // Hiệu ứng hover nhỏ khi di chuột vào poster
     card.onmouseover = () => card.style.transform = "scale(1.05)";
     card.onmouseout = () => card.style.transform = "scale(1)";
 
-    // Khi bấm vào phim sẽ gọi hàm xem phim full
     card.onclick = () => {
       watchMovie(movie.slug);
     };
@@ -58,7 +54,33 @@ function renderMovies(movies) {
   });
 }
 
-// 3. Lấy link xem phim FULL (link embed) theo slug khi người dùng bấm chọn phim
+// 3. Tạo thanh phân trang (Trang trước / Trang sau)
+function renderPagination(pagination) {
+  let paginationDiv = document.getElementById("pagination");
+  if (!paginationDiv) {
+    paginationDiv = document.createElement("div");
+    paginationDiv.id = "pagination";
+    paginationDiv.style.textAlign = "center";
+    paginationDiv.style.padding = "20px";
+    document.body.appendChild(paginationDiv);
+  }
+
+  paginationDiv.innerHTML = `
+    <button onclick="changePage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} style="padding: 10px 20px; margin-right: 10px; cursor: pointer;">Trang trước</button>
+    <span style="color: white; font-weight: bold; margin: 0 10px;">Trang ${currentPage}</span>
+    <button onclick="changePage(${currentPage + 1})" style="padding: 10px 20px; margin-left: 10px; cursor: pointer;">Trang sau</button>
+  `;
+}
+
+// Đổi trang
+window.changePage = function(page) {
+  if (page < 1) return;
+  currentPage = page;
+  getMovies(currentPage);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// 4. Lấy link xem phim FULL theo slug
 async function watchMovie(slug) {
   try {
     const res = await fetch(`${BASE_URL}/phim/${slug}`);
@@ -68,7 +90,6 @@ async function watchMovie(slug) {
     if (episodes && episodes.length > 0) {
       const embedUrl = episodes[0].link_embed;
       
-      // Tạo hoặc tìm khung iframe để phát video
       let player = document.getElementById("movie-player");
       if (!player) {
         player = document.createElement("iframe");
@@ -78,7 +99,6 @@ async function watchMovie(slug) {
         player.style.border = "none";
         player.style.marginBottom = "20px";
         
-        // Chèn iframe lên đầu trang web để xem
         const main = document.querySelector("main") || document.body;
         main.prepend(player);
       }
@@ -90,5 +110,4 @@ async function watchMovie(slug) {
   }
 }
 
-// Tự động tải danh sách phim khi mở trang
-document.addEventListener("DOMContentLoaded", getMovies);
+document.addEventListener("DOMContentLoaded", () => getMovies(currentPage));
