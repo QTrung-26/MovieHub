@@ -8,23 +8,29 @@
 </head>
 <body>
   <header class="nav">
-    <h1 class="logo">MovieHub</h1>
-    <input id="search" type="search" placeholder="Tìm phim...">
+    <h1 class="logo" style="cursor: pointer;" onclick="loadData('phim-moi-cap-nhat', 1)">MovieHub</h1>
+    
+    <!-- Menu chọn thể loại -->
+    <nav class="categories" style="display: flex; gap: 10px; margin: 0 20px;">
+      <button onclick="loadData('phim-moi-cap-nhat', 1)">Mới Nhất</button>
+      <button onclick="loadData('phim-le', 1)">Phim Lẻ</button>
+      <button onclick="loadData('phim-bo', 1)">Phim Bộ</button>
+      <button onclick="loadData('hoat-hinh', 1)">Hoạt Hình</button>
+      <button onclick="loadData('tv-shows', 1)">TV Shows</button>
+    </nav>
+
+    <input id="search" type="search" placeholder="Tìm kiếm phim...">
     <button id="favBtn">❤ Yêu thích</button>
   </header>
 
+  <section id="player-container"></section>
   <section id="hero" class="hero"></section>
   <main id="rows"></main>
-  <section id="results" class="grid hidden"></section>
+  <div id="pagination"></div>
 
-  <div id="modal" class="modal hidden">
-    <div class="modal-box">
-      <button id="close">✕</button>
-      <div id="modal-content"></div>
-    </div>
-  </div>
-
-  <footer>Dữ liệu phim từ TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.</footer>
+  <footer>Dữ liệu phim từ KKPhim API.</footer>
+  
+  <!-- Dùng duy nhất 1 file app.js -->
   <script src="app.js"></script>
 </body>
 </html>
