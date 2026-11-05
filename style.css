@@ -320,4 +320,4 @@ footer {
   main, #results { padding: 16px; }
   .card { flex: 0 0 130px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
-}
+}=
