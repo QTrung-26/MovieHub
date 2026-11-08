@@ -1,4 +1,4 @@
-const BASE_URL = "https://phimapi.com";
+const BASE_URL = (typeof CONFIG !== 'undefined' && CONFIG.SECRET_URL) ? CONFIG.SECRET_URL : "https://phimapi.com";
 let currentCategory = "phim-moi-cap-nhat";
 let pageIndex = 1;
 let currentKeyword = "";
@@ -42,7 +42,6 @@ async function searchMoviesAPI(keyword) {
   }
 }
 
-// 3. Lấy chi tiết phim và link embed xem phim
 async function fetchMovieDetail(slug) {
   try {
     const res = await fetch(`${BASE_URL}/phim/${slug}`);

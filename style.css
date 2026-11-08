@@ -1,4 +1,4 @@
-/* --- RESET & VARIABLES --- */
+
 :root {
   --bg-primary: #090a0f;
   --bg-secondary: #12151e;
@@ -35,7 +35,7 @@ body {
   display: none !important;
 }
 
-/* Custom Scrollbar */
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -132,7 +132,7 @@ button:active {
   padding: 60px 40px;
 }
 
-/* Gradient overlay giúp chữ rõ ràng và hiệu ứng chuyển nền mượt hơn */
+
 .hero::before {
   content: '';
   position: absolute;
@@ -166,7 +166,7 @@ button:active {
   line-height: 1.6;
 }
 
-/* --- MAIN & SECTIONS --- */
+
 main, #results {
   padding: 30px 40px;
 }
@@ -182,7 +182,6 @@ h3 {
   gap: 8px;
 }
 
-/* Row (Ngang) */
 .row {
   display: flex;
   gap: 16px;
@@ -191,7 +190,7 @@ h3 {
   scroll-behavior: smooth;
 }
 
-/* Cards */
+
 .card {
   flex: 0 0 170px;
   cursor: pointer;
@@ -225,7 +224,7 @@ h3 {
   text-overflow: ellipsis;
 }
 
-/* Grid layout */
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
