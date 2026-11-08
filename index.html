@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.png" type="image/png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,6 +23,9 @@
       <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
       <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z"/></symbol>
       <symbol id="i-laugh" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7.5 12.5h9a4.5 4.5 0 0 1-9 0zM9 9h.01M15 9h.01"/></symbol>
+      <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7M10 20a2 2 0 0 0 4 0"/></symbol>
+      <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h12l-2.5 4 2.5 4H5"/></symbol>
+      <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
       <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
     </defs>
   </svg>
@@ -29,7 +33,7 @@
   <header class="site-header">
     <div class="top-bar">
       <button class="logo" data-cat="phim-moi-cap-nhat" data-label="Trang chủ" onclick="goTo(this)" aria-label="QT - Trang chủ">
-        <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M12 9v14l11-7z" fill="#fff"/></svg>
+        <img class="logo-img" src="logo.png" alt="">
         <span class="logo-text">QT</span>
       </button>
 
@@ -64,10 +68,32 @@
         </details>
       </div>
 
+      <div class="search-box">
+        <input id="search" type="search" placeholder="Phim, diễn viên, thể loại..." aria-label="Tìm kiếm" enterkeyhint="search">
+        <button class="search-btn" id="search-btn" type="button" aria-label="Tìm kiếm"><svg class="ico"><use href="#i-search"/></svg></button>
+      </div>
+
       <div class="top-actions">
-        <div class="search-box" id="search-box">
-          <button class="icon-btn" id="search-toggle" aria-label="Tìm kiếm"><svg class="ico"><use href="#i-search"/></svg></button>
-          <input id="search" type="search" placeholder="Tìm phim, nhấn Enter" aria-label="Tìm phim">
+        <button class="icon-btn" data-cat="favorites" data-label="Phim yêu thích" onclick="goTo(this)" aria-label="Phim yêu thích">
+          <svg class="ico"><use href="#i-heart"/></svg><span class="badge" id="fav-count" hidden>0</span>
+        </button>
+        <div class="pop-wrap">
+          <button class="icon-btn" id="bell-btn" aria-label="Thông báo"><svg class="ico"><use href="#i-bell"/></svg><span class="badge" id="bell-badge" hidden>0</span></button>
+          <div class="pop" id="notif-panel" hidden><h3>Thông báo</h3><div id="notif-list"></div></div>
+        </div>
+        <button class="icon-btn" id="settings-btn" aria-label="Cài đặt"><svg class="ico"><use href="#i-sliders"/></svg></button>
+
+        <div class="guest-actions" id="guest-actions">
+          <a class="btn-ghost" href="login.html">Đăng nhập</a>
+          <a class="btn-solid" href="login.html#register">Đăng ký</a>
+        </div>
+        <div class="pop-wrap">
+          <button class="avatar" id="user-btn" aria-label="Tài khoản" hidden></button>
+          <div class="pop" id="user-panel" hidden>
+            <div class="user-info"><strong id="user-name"></strong><small id="user-email"></small></div>
+            <button class="pop-link" data-cat="favorites" data-label="Phim yêu thích" onclick="goTo(this)">Phim yêu thích</button>
+            <button class="pop-link" id="logout-btn">Đăng xuất</button>
+          </div>
         </div>
       </div>
     </div>
@@ -77,6 +103,7 @@
       <span class="chip-divider"></span>
       <div class="chips" id="chips">
         <button class="chip" data-cat="phim-bo" data-label="Phim bộ" onclick="goTo(this)"><svg class="ico"><use href="#i-series"/></svg>Phim bộ</button>
+        <button class="chip" data-cat="quoc-gia/han-quoc" data-label="Phim Hàn" onclick="goTo(this)"><svg class="ico"><use href="#i-flag"/></svg>Phim Hàn</button>
         <button class="chip" data-cat="phim-le" data-label="Phim lẻ" onclick="goTo(this)"><svg class="ico"><use href="#i-film"/></svg>Phim lẻ</button>
         <button class="chip" data-cat="hoat-hinh" data-label="Hoạt hình" onclick="goTo(this)"><svg class="ico"><use href="#i-smile"/></svg>Hoạt hình</button>
         <button class="chip" data-cat="tv-shows" data-label="TV Shows" onclick="goTo(this)"><svg class="ico"><use href="#i-tv"/></svg>TV Shows</button>
@@ -90,50 +117,58 @@
     </div>
   </header>
 
+  <dialog class="modal" id="settings-dialog">
+    <div class="auth-box">
+      <button class="auth-close" id="settings-close" aria-label="Đóng">×</button>
+      <h2>Cài đặt</h2>
+      <div class="set-row">
+        <h3>Màu chủ đạo</h3>
+        <div class="swatches">
+          <button class="swatch" data-color="#2aa8ff" style="--c:#2aa8ff" aria-label="Xanh đại dương"></button>
+          <button class="swatch" data-color="#8b7bff" style="--c:#8b7bff" aria-label="Tím"></button>
+          <button class="swatch" data-color="#2ed3a0" style="--c:#2ed3a0" aria-label="Xanh ngọc"></button>
+          <button class="swatch" data-color="#ff9f1c" style="--c:#ff9f1c" aria-label="Cam"></button>
+          <button class="swatch" data-color="#ff4d6d" style="--c:#ff4d6d" aria-label="Hồng"></button>
+        </div>
+      </div>
+      <div class="set-row">
+        <h3>Dữ liệu trên trình duyệt</h3>
+        <button class="set-btn" id="clear-favs">Xóa danh sách phim yêu thích</button>
+        <button class="set-btn" id="reset-notifs">Đặt lại thông báo đã đọc</button>
+      </div>
+    </div>
+  </dialog>
+
   <main>
     <div id="player-container" style="display:none;"></div>
     <div id="rows"></div>
     <div id="pagination"></div>
   </main>
 
-  <footer class="site-footer">Dữ liệu phim từ KKPhim API.</footer>
-
+  <script src="firebase-config.js"></script>
   <script src="app.js"></script>
+  <script type="module" src="auth.js"></script>
   <script>
     const $id = (id) => document.getElementById(id);
 
-    function goTo(el) {
-      const cat = el.dataset.cat;
+    // Mở một danh mục: đánh dấu nút, đổi nhãn, tải dữ liệu
+    window.openCategory = function (cat, label) {
       if (!cat) return;
       document.querySelectorAll(".chip").forEach((c) => c.classList.toggle("active", c.dataset.cat === cat));
-      $id("section-label").textContent = el.dataset.label || "Trang chủ";
+      $id("section-label").textContent = label || "Trang chủ";
       document.querySelectorAll(".dd[open]").forEach((d) => d.removeAttribute("open"));
       $id("search").value = "";
-      $id("search-box").classList.remove("open");
       window.loadData(cat, 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    };
+    function goTo(el) { window.openCategory(el.dataset.cat, el.dataset.label); }
 
     // Đóng menu thả xuống khi bấm ra ngoài
     document.addEventListener("click", (e) => {
       document.querySelectorAll(".dd[open]").forEach((d) => { if (!d.contains(e.target)) d.removeAttribute("open"); });
     });
 
-    // Ô tìm kiếm: bấm biểu tượng để mở rộng
-    const box = $id("search-box"), input = $id("search");
-    $id("search-toggle").addEventListener("click", () => {
-      box.classList.toggle("open");
-      if (box.classList.contains("open")) input.focus();
-    });
-    input.addEventListener("blur", () => { if (!input.value.trim()) box.classList.remove("open"); });
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && input.value.trim()) {
-        $id("section-label").textContent = "Kết quả tìm kiếm";
-        document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
-      }
-    });
-
-    // Mũi tên cuộn danh mục
+        // Mũi tên cuộn danh mục
     const chips = $id("chips"), next = $id("chip-next");
     const syncNext = () => { next.style.visibility = chips.scrollLeft + chips.clientWidth >= chips.scrollWidth - 4 ? "hidden" : "visible"; };
     next.addEventListener("click", () => chips.scrollBy({ left: 320, behavior: "smooth" }));
