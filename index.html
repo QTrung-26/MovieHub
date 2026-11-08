@@ -7,11 +7,11 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Thanh điều hướng -->
   <header class="nav">
-    <h1 class="logo" style="cursor: pointer;" onclick="loadData('phim-moi-cap-nhat', 1)">MovieHub</h1>
+    <h1 class="logo" onclick="loadData('phim-moi-cap-nhat', 1)">MOVIEHUB</h1>
     
-    <!-- Menu chọn thể loại -->
-    <nav class="categories" style="display: flex; gap: 10px; margin: 0 20px;">
+    <nav class="categories">
       <button onclick="loadData('phim-moi-cap-nhat', 1)">Mới Nhất</button>
       <button onclick="loadData('phim-le', 1)">Phim Lẻ</button>
       <button onclick="loadData('phim-bo', 1)">Phim Bộ</button>
@@ -23,14 +23,16 @@
     <button id="favBtn">❤ Yêu thích</button>
   </header>
 
-  <!-- Ẩn khung player khi chưa bấm xem phim để không bị khoảng đen -->
-  <section id="player-container" style="display: none;"></section>
+  <!-- Khung phát phim chi tiết (Ẩn đi mặc định) -->
+  <section id="player-container" style="display: none; padding: 30px 40px; background: #171717;"></section>
   
-  <section id="hero" class="hero"></section>
+  <!-- Khu vực hiển thị danh sách phim / trang chủ -->
   <main id="rows"></main>
+  
+  <!-- Phân trang -->
   <div id="pagination"></div>
 
-  <footer>Dữ liệu phim từ KKPhim API.</footer>
+  <footer>Dữ liệu phim từ KKPhim & Ophim API.</footer>
   
   <script src="app.js"></script>
 </body>
