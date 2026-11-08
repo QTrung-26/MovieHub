@@ -1,4 +1,4 @@
-const BASE_URL = (typeof CONFIG !== 'undefined' && CONFIG.SECRET_URL) ? CONFIG.SECRET_URL : "https://phimapi.com";
+const BASE_URL = "https://phimapi.com";
 let currentCategory = "phim-moi-cap-nhat";
 let pageIndex = 1;
 let currentKeyword = "";
@@ -12,6 +12,10 @@ async function fetchMovies(category, page) {
     }
     const res = await fetch(url);
     const data = await res.json();
+    
+    // Lấy domain CDN trả về trực tiếp từ API nếu có (rất quan trọng để không bị lỗi ảnh)
+    window.APP_DOMAIN_CDN = data.data?.APP_DOMAIN_CDN_IMAGE || "https://img.phimapi.com";
+
     return {
       items: data.data?.items || data.items || [],
       pagination: data.data?.params?.pagination || data.pagination || {}
@@ -28,20 +32,15 @@ async function searchMoviesAPI(keyword) {
   try {
     const res = await fetch(`${BASE_URL}/v1/api/tim-kiem?keyword=${encodeURIComponent(keyword)}&limit=24`);
     const data = await res.json();
-    const domainCdn = data.data?.APP_DOMAIN_CDN_IMAGE || "https://phimimg.com";
-    return (data.data?.items || []).map(item => {
-      let poster = item.poster_url || item.thumb_url;
-      if (poster && !poster.startsWith('http')) {
-        poster = `${domainCdn}/${poster}`;
-      }
-      return { ...item, poster_url: poster };
-    });
+    window.APP_DOMAIN_CDN = data.data?.APP_DOMAIN_CDN_IMAGE || "https://img.phimapi.com";
+    return data.data?.items || [];
   } catch (err) {
     console.error("Lỗi tìm kiếm:", err);
     return [];
   }
 }
 
+// 3. Lấy chi tiết phim và link embed xem phim
 async function fetchMovieDetail(slug) {
   try {
     const res = await fetch(`${BASE_URL}/phim/${slug}`);
@@ -56,8 +55,16 @@ async function fetchMovieDetail(slug) {
 function getImageUrl(movie) {
   let img = movie.poster_url || movie.thumb_url || "";
   if (!img) return "https://via.placeholder.com/180x260?text=No+Image";
-  if (img.startsWith("http")) return img;
-  return `https://img.phimapi.com/${img}`;
+  
+  // Nếu đường dẫn đã là http hoặc https đầy đủ thì dùng luôn
+  if (img.startsWith("http://") || img.startsWith("https://")) {
+    return img;
+  }
+
+  // Nếu là đường dẫn tương đối, ghép với domain CDN lấy từ API
+  const cdnDomain = window.APP_DOMAIN_CDN || "https://img.phimapi.com";
+  let cleanPath = img.startsWith("/") ? img : `/${img}`;
+  return `${cdnDomain}${cleanPath}`;
 }
 
 function renderMoviesUI(movies) {
@@ -84,7 +91,7 @@ function renderMoviesUI(movies) {
 
     card.innerHTML = `
       <img src="${imgUrl}" alt="${movie.name}" 
-           onerror="this.onerror=null; this.src='https://via.placeholder.com/180x260?text=Error';"
+           onerror="this.onerror=null; this.src='https://via.placeholder.com/180x260?text=No+Image';"
            style="width: 100%; height: 260px; object-fit: cover; border-radius: 8px; background-color: #222;">
       <h4 style="color: white; font-size: 14px; margin: 8px 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${movie.name}">${movie.name}</h4>
       <p style="color: #aaa; font-size: 12px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${movie.origin_name || ''}">${movie.origin_name || ''}</p>
@@ -106,21 +113,17 @@ function renderPlayerUI(movieData) {
   const embedUrl = episodes[0].link_embed;
   let playerContainer = document.getElementById("player-container");
   
-  if (!playerContainer) {
-    playerContainer = document.createElement("div");
-    playerContainer.id = "player-container";
+  if (playerContainer) {
+    playerContainer.style.display = "block";
     playerContainer.style.padding = "20px";
     playerContainer.style.background = "#111";
     
-    const main = document.querySelector("main") || document.body;
-    main.prepend(playerContainer);
+    playerContainer.innerHTML = `
+      <h2 style="color: white; margin-bottom: 10px;">Đang phát: ${movieData.movie?.name || ''}</h2>
+      <iframe src="${embedUrl}" style="width: 100%; height: 500px; border: none; border-radius: 8px;" allowfullscreen></iframe>
+    `;
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
-
-  playerContainer.innerHTML = `
-    <h2 style="color: white; margin-bottom: 10px;">Đang phát: ${movieData.movie?.name || ''}</h2>
-    <iframe src="${embedUrl}" style="width: 100%; height: 500px; border: none; border-radius: 8px;" allowfullscreen></iframe>
-  `;
-  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function renderPaginationUI(currentPage) {
@@ -148,6 +151,10 @@ window.loadData = async function(category = currentCategory, page = pageIndex) {
   currentCategory = category;
   pageIndex = page;
   currentKeyword = "";
+  
+  const playerContainer = document.getElementById("player-container");
+  if (playerContainer) playerContainer.style.display = "none";
+
   const { items } = await fetchMovies(currentCategory, pageIndex);
   renderMoviesUI(items);
   renderPaginationUI(pageIndex);
@@ -168,7 +175,6 @@ function handlePageChange(newPage) {
 document.addEventListener("DOMContentLoaded", () => {
   window.loadData("phim-moi-cap-nhat", 1);
 
-  // Xử lý sự kiện tìm kiếm khi nhấn Enter trên ô input
   const searchInput = document.getElementById("search");
   if (searchInput) {
     searchInput.addEventListener("keypress", async (e) => {
@@ -179,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const results = await searchMoviesAPI(keyword);
         renderMoviesUI(results);
         const pag = document.getElementById("pagination");
-        if (pag) pag.innerHTML = ""; // Ẩn phân trang khi đang xem kết quả tìm kiếm
+        if (pag) pag.innerHTML = ""; 
       }
     });
   }
