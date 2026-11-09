@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#070d18">
   <link rel="icon" href="logo.png" type="image/png">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -26,6 +27,8 @@
       <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7M10 20a2 2 0 0 0 4 0"/></symbol>
       <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h12l-2.5 4 2.5 4H5"/></symbol>
       <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+      <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+      <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
       <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
     </defs>
   </svg>
@@ -84,8 +87,7 @@
         <button class="icon-btn" id="settings-btn" aria-label="Cài đặt"><svg class="ico"><use href="#i-sliders"/></svg></button>
 
         <div class="guest-actions" id="guest-actions">
-          <a class="btn-ghost" href="login.html">Đăng nhập</a>
-          <a class="btn-solid" href="login.html#register">Đăng ký</a>
+          <a class="login-icon" href="login.html" aria-label="Đăng nhập" title="Đăng nhập"><svg class="ico"><use href="#i-user"/></svg></a>
         </div>
         <div class="pop-wrap">
           <button class="avatar" id="user-btn" aria-label="Tài khoản" hidden></button>
@@ -145,6 +147,8 @@
     <div id="pagination"></div>
   </main>
 
+  <button class="to-top" id="to-top" aria-label="Lên đầu trang"><svg class="ico"><use href="#i-up"/></svg></button>
+
   <script src="firebase-config.js"></script>
   <script src="app.js"></script>
   <script type="module" src="auth.js"></script>
@@ -168,7 +172,14 @@
       document.querySelectorAll(".dd[open]").forEach((d) => { if (!d.contains(e.target)) d.removeAttribute("open"); });
     });
 
-        // Mũi tên cuộn danh mục
+        // Header đậm dần khi cuộn + nút lên đầu trang
+    const hdr = document.querySelector(".site-header"), toTop = $id("to-top");
+    const onScroll = () => { const y = window.scrollY; hdr.classList.toggle("scrolled", y > 20); toTop.classList.toggle("show", y > 700); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+    // Mũi tên cuộn danh mục
     const chips = $id("chips"), next = $id("chip-next");
     const syncNext = () => { next.style.visibility = chips.scrollLeft + chips.clientWidth >= chips.scrollWidth - 4 ? "hidden" : "visible"; };
     next.addEventListener("click", () => chips.scrollBy({ left: 320, behavior: "smooth" }));

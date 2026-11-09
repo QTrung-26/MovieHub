@@ -9,69 +9,129 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    body.nx { min-height: 100vh; background: radial-gradient(1100px 520px at 50% -8%, rgba(42,168,255,.3), transparent 65%), linear-gradient(#0a1628, #04080f 62%); }
+    .nx-top { display: flex; align-items: center; justify-content: space-between; padding: 14px var(--pad); border-bottom: 1px solid rgba(255,255,255,.1); }
+    .nx-brand { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em; text-decoration: none; }
+    .nx-brand img { height: 44px; width: auto; }
+    .nx-switch { padding: 8px 20px; border: 1px solid var(--line); border-radius: 999px; color: var(--text); font-weight: 700; text-decoration: none; }
+    .nx-switch:hover { border-color: var(--accent); color: var(--accent); }
+
+    .nx-col { display: grid; gap: 18px; width: min(440px, calc(100% - 40px)); margin: 56px auto 80px; }
+    #flow { display: grid; gap: 18px; }
+    #nx-title { font-size: clamp(1.7rem, 4vw, 2rem); line-height: 1.2; letter-spacing: -0.01em; }
+    .nx-sub { margin-top: -8px; color: #c9d3e3; font-size: 1.05rem; }
+    .nx-link { padding: 0; background: none; border: 0; color: #fff; font-size: inherit; text-decoration: underline; }
+    .nx-link:hover { color: var(--accent); }
+    .nx-link:disabled { opacity: .5; }
+
+    #flow form { display: grid; gap: 14px; }
+    .nx-field { position: relative; }
+    .nx-field input { width: 100%; height: 56px; padding: 22px 16px 6px; background: rgba(7,13,24,.6); border: 1px solid #5b6b85; border-radius: 6px; color: #fff; font-size: 1rem; }
+    .nx-field input:focus { border-color: #fff; outline: none; }
+    .nx-field.bad input { border-color: #ff6b7a; }
+    .nx-field label { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #9aa6bb; pointer-events: none; transition: top .15s, font-size .15s; }
+    .nx-field input:focus + label, .nx-field input:not(:placeholder-shown) + label { top: 17px; font-size: .75rem; }
+    .nx-err { display: flex; align-items: center; gap: 8px; margin-top: -4px; color: #ff6b7a; font-size: .85rem; }
+    .nx-err.ok { color: #4ade80; }
+    .nx-err svg { flex: none; }
+    .nx-who { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: rgba(255,255,255,.07); border-radius: 6px; }
+    .nx-who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .nx-btn { height: 48px; border: 0; border-radius: 6px; background: var(--accent); color: var(--accent-ink); font-size: 1rem; font-weight: 700; }
+    .nx-btn:hover:not(:disabled) { filter: brightness(1.1); }
+    .nx-btn:disabled { opacity: .6; cursor: wait; }
+    .nx-or { display: flex; align-items: center; gap: 12px; color: #9aa6bb; font-size: .85rem; }
+    .nx-or::before, .nx-or::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.18); }
+    .nx-google { display: flex; align-items: center; justify-content: center; gap: 10px; height: 48px; background: transparent; border: 1px solid #5b6b85; border-radius: 6px; font-weight: 600; }
+    .nx-google:hover:not(:disabled) { border-color: #fff; }
+    .nx-google svg { width: 20px; height: 20px; }
+    .nx-help summary { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; list-style: none; font-size: 1.02rem; }
+    .nx-help summary::-webkit-details-marker { display: none; }
+    .nx-help summary::after { content: ""; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); }
+    .nx-help[open] summary::after { transform: rotate(-135deg); }
+    .nx-help div { display: grid; gap: 8px; margin-top: 12px; color: #c9d3e3; font-size: .92rem; line-height: 1.5; }
+    .nx-note { color: #8b97ac; font-size: .8rem; line-height: 1.5; }
+  </style>
 </head>
-<body>
-  <main class="auth-page">
-    <div class="auth-card">
-      <div class="auth-box">
-        <a class="auth-back" href="index.html">← Về trang chủ</a>
-        <img class="auth-logo" src="logo.png" alt="QT">
+<body class="nx">
+  <header class="nx-top">
+    <a class="nx-brand" href="index.html"><img src="logo.png" alt=""><span>QT</span></a>
+    <a class="nx-switch" id="top-switch" href="#register">Đăng ký</a>
+  </header>
 
-        <div class="auth-notice" id="notice" hidden>
-          Chưa kết nối Firebase. Mở file <strong>firebase-config.js</strong>, dán cấu hình dự án của bạn vào rồi tải lại trang.
+  <main class="nx-col">
+    <div class="auth-notice" id="notice" hidden>
+      Chưa kết nối Firebase. Mở file <strong>firebase-config.js</strong>, dán cấu hình dự án của bạn vào rồi tải lại trang.
+    </div>
+
+    <!-- Khi đã đăng nhập -->
+    <div class="session-box" id="session-box" hidden>
+      <p>Bạn đang đăng nhập với tên <strong id="session-name"></strong></p>
+      <a href="index.html">Tiếp tục xem phim</a>
+      <button type="button" id="session-logout">Đăng xuất</button>
+    </div>
+
+    <div id="flow">
+      <h1 id="nx-title">Nhập thông tin của bạn để đăng nhập</h1>
+      <p class="nx-sub" id="nx-sub"><span id="sub-text"></span> <button type="button" class="nx-link" id="sub-link"></button><span id="sub-dot">.</span></p>
+
+      <!-- Bước 1: email hoặc số điện thoại -->
+      <form id="step-id" novalidate>
+        <div class="nx-field">
+          <input id="ident" autocomplete="username" placeholder=" ">
+          <label for="ident">Email hoặc số điện thoại di động</label>
         </div>
+        <p class="nx-err" id="err-id" role="alert" hidden></p>
+        <button class="nx-btn" id="id-submit" type="submit">Tiếp tục</button>
+      </form>
 
-        <!-- Khi đã đăng nhập -->
-        <div class="session-box" id="session-box" hidden>
-          <p>Bạn đang đăng nhập với tên <strong id="session-name"></strong></p>
-          <a href="index.html">Tiếp tục xem phim</a>
-          <button type="button" id="session-logout">Đăng xuất</button>
+      <!-- Bước 2a: mật khẩu (đăng nhập bằng email) -->
+      <form id="step-pw" novalidate hidden>
+        <div class="nx-who"><span class="who-val"></span><button type="button" class="nx-link change-id">Đổi</button></div>
+        <div class="nx-field">
+          <input id="pw" type="password" autocomplete="current-password" placeholder=" ">
+          <label for="pw">Mật khẩu</label>
         </div>
+        <p class="nx-err" id="err-pw" role="alert" hidden></p>
+        <button class="nx-btn" id="pw-submit" type="submit">Đăng nhập</button>
+        <button type="button" class="nx-link" id="forgot">Quên mật khẩu?</button>
+      </form>
 
-        <div id="auth-main" style="display: contents;">
-          <div class="auth-tabs" id="tabs">
-            <button type="button" class="tab active" data-mode="login">Đăng nhập</button>
-            <button type="button" class="tab" data-mode="register">Đăng ký</button>
-          </div>
+      <!-- Bước 2b: tạo tài khoản bằng email -->
+      <form id="step-reg" novalidate hidden>
+        <div class="nx-who"><span class="who-val"></span><button type="button" class="nx-link change-id">Đổi</button></div>
+        <div class="nx-field"><input id="reg-name" autocomplete="name" placeholder=" "><label for="reg-name">Tên hiển thị</label></div>
+        <div class="nx-field"><input id="reg-pw" type="password" autocomplete="new-password" placeholder=" "><label for="reg-pw">Mật khẩu (ít nhất 6 ký tự)</label></div>
+        <div class="nx-field"><input id="reg-pw2" type="password" autocomplete="new-password" placeholder=" "><label for="reg-pw2">Nhập lại mật khẩu</label></div>
+        <p class="nx-err" id="err-reg" role="alert" hidden></p>
+        <button class="nx-btn" id="reg-submit" type="submit">Tạo tài khoản</button>
+      </form>
 
-          <!-- Email -->
-          <div id="email-pane" style="display: contents;">
-            <form id="auth-form" novalidate>
-              <label id="name-field" hidden>Tên hiển thị<input id="auth-name" autocomplete="name"></label>
-              <label>Email<input id="auth-email" type="email" autocomplete="email"></label>
-              <label>Mật khẩu<input id="auth-pw" type="password" autocomplete="current-password"></label>
-              <label id="pw2-field" hidden>Nhập lại mật khẩu<input id="auth-pw2" type="password" autocomplete="new-password"></label>
-              <button type="button" class="link-btn" id="forgot">Quên mật khẩu?</button>
-              <button class="auth-submit" id="email-submit" type="submit">Đăng nhập</button>
-            </form>
-          </div>
+      <!-- Bước 2c: mã SMS (số điện thoại) -->
+      <form id="step-code" novalidate hidden>
+        <div class="nx-who"><span class="who-val"></span><button type="button" class="nx-link change-id">Đổi</button></div>
+        <div class="nx-field"><input id="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder=" "><label for="code">Mã xác nhận 6 số</label></div>
+        <p class="nx-err" id="err-code" role="alert" hidden></p>
+        <button class="nx-btn" id="code-submit" type="submit">Xác nhận</button>
+        <button type="button" class="nx-link" id="resend">Gửi lại mã</button>
+      </form>
 
-          <!-- Số điện thoại -->
-          <div id="phone-pane" style="display: contents;" hidden>
-            <form id="phone-form" novalidate>
-              <p class="phone-hint">Nhập số điện thoại, chúng tôi gửi mã 6 số qua SMS. Số chưa có tài khoản sẽ được tạo mới tự động.</p>
-              <label>Số điện thoại<input id="phone" type="tel" placeholder="0912 345 678" autocomplete="tel"></label>
-              <button class="auth-submit" id="send-code" type="submit">Gửi mã xác nhận</button>
-              <div id="code-step" hidden>
-                <label>Mã xác nhận<input id="code" inputmode="numeric" maxlength="6" placeholder="6 chữ số" autocomplete="one-time-code"></label>
-                <button class="auth-submit" id="confirm-code" type="button">Xác nhận và đăng nhập</button>
-              </div>
-            </form>
-          </div>
+      <div class="nx-or"><span>hoặc</span></div>
+      <button type="button" class="nx-google" id="google-btn">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Tiếp tục với Google
+      </button>
 
-          <p class="auth-error" id="auth-error" role="alert"></p>
-
-          <div class="auth-or"><span>hoặc tiếp tục với</span></div>
-          <div class="auth-alt">
-            <button type="button" class="alt-btn" id="google-btn">
-              <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-              Google
-            </button>
-            <button type="button" class="alt-btn" id="phone-toggle"><span id="phone-toggle-label">Số điện thoại</span></button>
-          </div>
-          <div id="recaptcha"></div>
+      <details class="nx-help">
+        <summary>Nhận trợ giúp</summary>
+        <div>
+          <span>Đăng nhập bằng email: nhập email, bấm Tiếp tục rồi nhập mật khẩu. Quên mật khẩu thì bấm "Quên mật khẩu?" ở bước đó để nhận email đặt lại.</span>
+          <span>Đăng nhập bằng số điện thoại: nhập số (ví dụ 0912 345 678), bạn sẽ nhận mã 6 số qua SMS. Số chưa có tài khoản sẽ được tạo mới tự động.</span>
         </div>
-      </div>
+      </details>
+      <p class="nx-note">Trang này được Google reCAPTCHA bảo vệ để đảm bảo bạn không phải là robot.</p>
+      <div id="recaptcha"></div>
     </div>
   </main>
 
@@ -79,7 +139,18 @@
     import * as A from "./auth.js";
 
     const $ = (id) => document.getElementById(id);
-    let mode = "login", busy = false;
+    let mode = "login", ident = null, busy = false, errId = "err-id";
+
+    const ERR_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+    function setErr(id, msg, ok = false) {
+      const el = $(id);
+      if (!msg) { el.hidden = true; el.textContent = ""; return; }
+      el.hidden = false;
+      el.classList.toggle("ok", ok);
+      el.innerHTML = (ok ? "" : ERR_ICON) + "<span></span>";
+      el.lastChild.textContent = msg;
+    }
 
     // Chỉ cho quay lại file .html cùng thư mục
     const nextUrl = () => {
@@ -87,17 +158,16 @@
       return /^[\w-]+\.html$/.test(n) ? n : "index.html";
     };
     const done = (user) => { A.syncSession(user); location.href = nextUrl(); };
-    const say = (text, ok = false) => { $("auth-error").textContent = text; $("auth-error").classList.toggle("ok", ok); };
 
     async function run(btn, fn) {
       if (busy) return;
-      busy = true; btn.disabled = true; say("");
-      try { await fn(); } catch (e) { say(A.friendlyError(e)); } finally { busy = false; btn.disabled = false; }
+      busy = true; btn.disabled = true; setErr(errId, "");
+      try { await fn(); } catch (e) { setErr(errId, A.friendlyError(e)); } finally { busy = false; btn.disabled = false; }
     }
 
-    // +84: nhận 0912..., 84912..., +84912...
+    // Nhận 0912..., 84912..., +84912...
     function toE164(raw) {
-      let p = raw.replace(/[\s.\-()]/g, "");
+      const p = raw.replace(/[\s.\-()]/g, "");
       if (p.startsWith("+")) return p;
       if (p.startsWith("00")) return "+" + p.slice(2);
       if (p.startsWith("0")) return "+84" + p.slice(1);
@@ -105,95 +175,127 @@
       return "+84" + p;
     }
 
+    function parseIdent(raw) {
+      const v = raw.trim();
+      if (!v) return null;
+      if (v.includes("@")) return /^\S+@\S+\.\S+$/.test(v) ? { type: "email", value: v } : null;
+      if (!/^[\d\s.\-()+]+$/.test(v)) return null;
+      const p = toE164(v);
+      return /^\+\d{9,15}$/.test(p) ? { type: "phone", value: p } : null;
+    }
+
+    const FORMS = { id: "step-id", pw: "step-pw", reg: "step-reg", code: "step-code" };
+
+    function setHead(step) {
+      const titles = { pw: "Chào mừng trở lại", reg: "Hoàn tất tạo tài khoản", code: "Nhập mã xác nhận" };
+      $("nx-title").textContent = titles[step] || (mode === "login" ? "Nhập thông tin của bạn để đăng nhập" : "Tạo tài khoản mới để bắt đầu");
+      const sub = $("nx-sub");
+      if (step === "id") {
+        sub.hidden = false; $("sub-link").hidden = $("sub-dot").hidden = false;
+        $("sub-text").textContent = mode === "login" ? "Hoặc bắt đầu với" : "Đã có tài khoản?";
+        $("sub-link").textContent = mode === "login" ? "một tài khoản mới" : "Đăng nhập";
+      } else if (step === "code") {
+        sub.hidden = false; $("sub-link").hidden = $("sub-dot").hidden = true;
+        $("sub-text").textContent = "Mã 6 số đã được gửi qua SMS tới " + ident.value + ".";
+      } else {
+        sub.hidden = true;
+      }
+    }
+
+    function gotoStep(step) {
+      Object.entries(FORMS).forEach(([k, f]) => { $(f).hidden = k !== step; });
+      errId = "err-" + step;
+      Object.keys(FORMS).forEach((k) => setErr("err-" + k, ""));
+      document.querySelectorAll(".nx-field").forEach((f) => f.classList.remove("bad"));
+      document.querySelectorAll(".who-val").forEach((el) => (el.textContent = ident ? ident.value : ""));
+      setHead(step);
+      $(FORMS[step]).querySelector("input")?.focus();
+    }
+
     function setMode(m) {
       mode = m;
-      document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.mode === m));
-      $("name-field").hidden = $("pw2-field").hidden = m !== "register";
-      $("forgot").hidden = m !== "login";
-      $("auth-pw").autocomplete = m === "login" ? "current-password" : "new-password";
-      $("email-submit").textContent = m === "login" ? "Đăng nhập" : "Tạo tài khoản";
+      $("top-switch").textContent = m === "login" ? "Đăng ký" : "Đăng nhập";
       document.title = (m === "login" ? "Đăng nhập" : "Đăng ký") + " - QT";
-      say("");
+      gotoStep("id");
     }
 
-    function showPhone(on) {
-      $("email-pane").hidden = on; $("phone-pane").hidden = !on; $("tabs").hidden = on;
-      $("email-pane").style.display = on ? "none" : "contents";
-      $("phone-pane").style.display = on ? "contents" : "none";
-      $("phone-toggle-label").textContent = on ? "Email" : "Số điện thoại";
-      say("");
-    }
+    const toggleMode = () => {
+      setMode(mode === "login" ? "register" : "login");
+      history.replaceState(null, "", mode === "register" ? "#register" : location.pathname + location.search);
+    };
+    $("top-switch").addEventListener("click", (e) => { e.preventDefault(); toggleMode(); });
+    $("sub-link").addEventListener("click", toggleMode);
+    document.querySelectorAll(".change-id").forEach((b) => b.addEventListener("click", () => gotoStep("id")));
 
-    document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => {
-      setMode(t.dataset.mode);
-      history.replaceState(null, "", t.dataset.mode === "register" ? "#register" : location.pathname + location.search);
-    }));
-    $("phone-toggle").addEventListener("click", () => showPhone($("phone-pane").hidden));
-
-    $("auth-form").addEventListener("submit", (e) => {
+    // Bước 1
+    $("step-id").addEventListener("submit", (e) => {
       e.preventDefault();
-      const name = $("auth-name").value.trim(), email = $("auth-email").value.trim(), pw = $("auth-pw").value;
-      run($("email-submit"), async () => {
-        if (!/^\S+@\S+\.\S+$/.test(email)) throw new Error("Email chưa đúng định dạng.");
+      const p = parseIdent($("ident").value);
+      $("ident").closest(".nx-field").classList.toggle("bad", !p);
+      if (!p) return setErr("err-id", "Vui lòng nhập email hoặc số điện thoại di động hợp lệ.");
+      ident = p;
+      if (p.type === "email") return gotoStep(mode === "login" ? "pw" : "reg");
+      run($("id-submit"), async () => { await A.sendPhoneCode(p.value, "recaptcha"); gotoStep("code"); });
+    });
+
+    // Bước 2a: đăng nhập bằng mật khẩu
+    $("step-pw").addEventListener("submit", (e) => {
+      e.preventDefault();
+      run($("pw-submit"), async () => {
+        const pw = $("pw").value;
         if (pw.length < 6) throw new Error("Mật khẩu cần ít nhất 6 ký tự.");
-        if (mode === "register") {
-          if (!name) throw new Error("Vui lòng nhập tên hiển thị.");
-          if (pw !== $("auth-pw2").value) throw new Error("Mật khẩu nhập lại chưa khớp.");
-          done(await A.registerEmail(name, email, pw));
-        } else {
-          done(await A.loginEmail(email, pw));
-        }
+        done(await A.loginEmail(ident.value, pw));
       });
     });
+    $("forgot").addEventListener("click", () => run($("forgot"), async () => {
+      await A.resetPassword(ident.value);
+      setErr("err-pw", "Đã gửi email đặt lại mật khẩu tới " + ident.value + ". Hãy kiểm tra hộp thư.", true);
+    }));
 
-    $("forgot").addEventListener("click", () => {
-      const email = $("auth-email").value.trim();
-      run($("forgot"), async () => {
-        if (!/^\S+@\S+\.\S+$/.test(email)) throw new Error("Nhập email của bạn vào ô Email trước.");
-        await A.resetPassword(email);
-        say("Đã gửi email đặt lại mật khẩu tới " + email + ". Hãy kiểm tra hộp thư.", true);
-      });
-    });
-
-    $("google-btn").addEventListener("click", () => run($("google-btn"), async () => done(await A.loginGoogle())));
-
-    $("phone-form").addEventListener("submit", (e) => {
+    // Bước 2b: tạo tài khoản
+    $("step-reg").addEventListener("submit", (e) => {
       e.preventDefault();
-      run($("send-code"), async () => {
-        const phone = toE164($("phone").value);
-        if (!/^\+\d{9,15}$/.test(phone)) throw new Error("Số điện thoại chưa đúng.");
-        await A.sendPhoneCode(phone, "recaptcha");
-        $("code-step").hidden = false;
-        $("send-code").textContent = "Gửi lại mã";
-        say("Đã gửi mã tới " + phone + ".", true);
-        $("code").focus();
+      run($("reg-submit"), async () => {
+        const name = $("reg-name").value.trim(), pw = $("reg-pw").value;
+        if (!name) throw new Error("Vui lòng nhập tên hiển thị.");
+        if (pw.length < 6) throw new Error("Mật khẩu cần ít nhất 6 ký tự.");
+        if (pw !== $("reg-pw2").value) throw new Error("Mật khẩu nhập lại chưa khớp.");
+        done(await A.registerEmail(name, ident.value, pw));
       });
     });
-    $("confirm-code").addEventListener("click", () => {
-      run($("confirm-code"), async () => {
+
+    // Bước 2c: mã SMS
+    $("step-code").addEventListener("submit", (e) => {
+      e.preventDefault();
+      run($("code-submit"), async () => {
         const code = $("code").value.trim();
         if (!/^\d{6}$/.test(code)) throw new Error("Mã xác nhận gồm 6 chữ số.");
         done(await A.confirmPhoneCode(code));
       });
     });
+    $("resend").addEventListener("click", () => run($("resend"), async () => {
+      await A.sendPhoneCode(ident.value, "recaptcha");
+      setErr("err-code", "Đã gửi lại mã.", true);
+    }));
+
+    $("google-btn").addEventListener("click", () => run($("google-btn"), async () => done(await A.loginGoogle())));
 
     // Chưa cấu hình Firebase: báo rõ và khóa biểu mẫu
     if (!A.configured) {
       $("notice").hidden = false;
-      document.querySelectorAll("#auth-main button, #auth-main input").forEach((el) => (el.disabled = true));
+      document.querySelectorAll("#flow button, #flow input").forEach((el) => (el.disabled = true));
     }
 
     // Đã đăng nhập sẵn thì hiện thông tin thay cho biểu mẫu
     await A.ready;
     const u = A.auth?.currentUser;
     if (u) {
-      $("auth-main").style.display = "none";
+      $("flow").hidden = true;
       $("session-box").hidden = false;
       $("session-name").textContent = u.displayName || u.email || u.phoneNumber || "bạn";
       $("session-logout").addEventListener("click", async () => { await A.logout(); location.reload(); });
     }
 
-    showPhone(false);
     setMode(location.hash === "#register" ? "register" : "login");
   </script>
 </body>

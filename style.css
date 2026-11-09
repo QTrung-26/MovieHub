@@ -448,3 +448,79 @@ dialog.modal::backdrop { background: rgba(3,8,16,.75); backdrop-filter: blur(4px
 #code-step { display: grid; gap: 14px; }
 .phone-hint { color: var(--muted); font-size: .88rem; line-height: 1.5; }
 .auth-submit:disabled, .alt-btn:disabled, .tab:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ===== Top 5: 5 poster trải đều hết chiều ngang ===== */
+.movie-card.ranked { width: calc((100% - 4 * var(--gap)) / 5); }
+.rank-num { font-size: clamp(4rem, 7vw, 6.5rem); }
+@media (min-width: 801px) { .movie-row-container:has(.ranked) .scroll-btn { display: none; } }
+@media (max-width: 800px) { .movie-card.ranked { width: calc((100% - 2 * var(--gap)) / 3.2); } }
+
+/* ===== Lưới danh mục đủ hàng + nút trang bằng mũi tên ===== */
+.movies-grid { --cols: 9; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); }
+@media (max-width: 1699px) { .movies-grid { --cols: 8; } }
+@media (max-width: 1499px) { .movies-grid { --cols: 7; } }
+@media (max-width: 1299px) { .movies-grid { --cols: 6; } }
+@media (max-width: 1099px) { .movies-grid { --cols: 5; } }
+@media (max-width: 899px) { .movies-grid { --cols: 4; } }
+@media (max-width: 699px) { .movies-grid { --cols: 3; } }
+@media (max-width: 479px) { .movies-grid { --cols: 2; } }
+#pagination .pg-btn { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 50%; font-size: 1rem; line-height: 1; }
+
+/* ===== v6: nâng cấp giao diện ===== */
+::selection { background: color-mix(in srgb, var(--accent) 45%, transparent); }
+html { scrollbar-width: thin; scrollbar-color: #243756 var(--bg); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #243756; border: 2px solid var(--bg); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #31507d; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+#rows > *, .movies-grid > .grid-card { animation: fadeUp .5s backwards; }
+.hero-content > * { animation: fadeUp .7s backwards; }
+.hero-content > :nth-child(2) { animation-delay: .06s; } .hero-content > :nth-child(3) { animation-delay: .12s; }
+.hero-content > :nth-child(4) { animation-delay: .18s; } .hero-content > :nth-child(5) { animation-delay: .24s; }
+.hero-content > :nth-child(6) { animation-delay: .3s; }
+.hero-poster { animation: fadeUp .9s .2s backwards; }
+.hero-title { text-shadow: 0 4px 30px rgba(0,0,0,.55); }
+.hero-btn-play { box-shadow: 0 8px 26px color-mix(in srgb, var(--accent) 42%, transparent); }
+
+/* Header */
+.site-header { transition: background .3s, box-shadow .3s; }
+.site-header.scrolled { background: rgba(7,13,24,.97); box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+.logo-img { transition: transform .25s; }
+.logo:hover .logo-img { transform: scale(1.07) rotate(-3deg); }
+.icon-btn { transition: background .2s, transform .2s; }
+.icon-btn:hover { transform: translateY(-1px); }
+.search-box { background: rgba(255,255,255,.04); backdrop-filter: blur(8px); transition: box-shadow .2s, border-color .2s; }
+.search-box:focus-within { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
+.login-icon { display: grid; place-items: center; width: 42px; height: 42px; margin-left: 6px; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 50%; transition: border-color .2s, color .2s, box-shadow .2s; }
+.login-icon:hover { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
+.avatar { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent); }
+
+/* Nút danh mục */
+.chip { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.06); transition: transform .2s, border-color .2s, background .2s, color .2s; }
+.chip:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+.chip.active { background: color-mix(in srgb, var(--accent) 16%, transparent); border-color: var(--accent); color: var(--accent); }
+
+/* Tiêu đề hàng có vạch nhấn */
+.row-title { display: flex; align-items: center; gap: 12px; }
+.row-title::before { content: ""; flex: none; width: 4px; height: 1.1em; border-radius: 2px; background: var(--accent); }
+
+/* Thẻ phim: lớp phủ tối + nút phát khi rê chuột */
+.movie-poster-wrapper::before, .grid-card::before {
+  content: ""; position: absolute; z-index: 2; top: 0; left: 0; right: 0; pointer-events: none; opacity: 0; transition: opacity .25s;
+  border-radius: var(--radius);
+  background: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2754%27 height=%2754%27%3E%3Ccircle cx=%2727%27 cy=%2727%27 r=%2726%27 fill=%27rgba(255,255,255,0.2)%27 stroke=%27white%27 stroke-opacity=%270.85%27 stroke-width=%271.5%27/%3E%3Cpath d=%27M22 17l16 10-16 10z%27 fill=%27white%27/%3E%3C/svg%3E") center / 54px no-repeat, linear-gradient(0deg, rgba(7,13,24,.72), transparent 60%);
+}
+.movie-poster-wrapper::before { bottom: 0; }
+.grid-card::before { aspect-ratio: 2 / 3; }
+.movie-card:hover .movie-poster-wrapper::before, .grid-card:hover::before { opacity: 1; }
+.movie-card:hover .movie-poster, .grid-card:hover .grid-poster { box-shadow: 0 12px 32px rgba(0,0,0,.55), 0 0 0 2px color-mix(in srgb, var(--accent) 70%, transparent); }
+.movie-title { transition: color .2s; }
+.movie-card:hover .movie-title, .grid-card:hover .movie-title { color: var(--accent); }
+.movie-badge { border-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,.35); }
+
+/* Nút lên đầu trang */
+.to-top { position: fixed; right: 24px; bottom: 24px; z-index: 60; display: grid; place-items: center; width: 46px; height: 46px; color: var(--text); background: rgba(14,24,41,.92); backdrop-filter: blur(8px); border: 1px solid var(--line); border-radius: 50%; opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .25s, transform .25s, border-color .2s, color .2s; }
+.to-top.show { opacity: 1; transform: none; pointer-events: auto; }
+.to-top:hover { color: var(--accent); border-color: var(--accent); }

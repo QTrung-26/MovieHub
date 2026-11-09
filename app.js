@@ -12,6 +12,8 @@ const CACHE_TTL = 5 * 60 * 1000;       // cache kết quả 5 phút
 const DEFAULT_ROW_LIMIT = 12;
 // Nếu poster dọc/ngang bị ngược (ảnh card bị cắt lạ), đổi thành true
 const SWAP_IMAGES = false;
+// Mỗi trang danh mục lấy nhiều phim hơn để sau khi lọc vẫn đủ hàng
+const GRID_LIMIT = 48;
 
 // Mỗi nguồn có domain ảnh riêng -> không còn dùng biến toàn cục window.APP_DOMAIN_CDN
 const SOURCES = [
@@ -24,14 +26,14 @@ const SOURCES = [
 const HOME_ROWS = [
   { id: "row-new",         title: "Phim Mới Cập Nhật",              endpoint: "danh-sach/phim-moi-cap-nhat", hero: true },
   { id: "row-top-series",  title: "Top 5 Phim Bộ Đang Hot",         endpoint: "v1/api/danh-sach/phim-bo", limit: 5, ranked: true },
-  { id: "row-top-kr",      title: "Top 5 Phim Hàn Không Thể Bỏ",    endpoint: "v1/api/quoc-gia/han-quoc", limit: 5, ranked: true },
+  { id: "row-top-kr",      title: "Top 5 Phim Hàn Không Thể Bỏ Lỡ",    endpoint: "v1/api/quoc-gia/han-quoc", limit: 5, ranked: true },
   { id: "row-top-movie",   title: "Top 5 Phim Lẻ Đặc Sắc",          endpoint: "v1/api/danh-sach/phim-le", limit: 5, ranked: true },
   { id: "row-cn",          title: "Hoạt Hình Trung Quốc",           endpoint: "v1/api/danh-sach/hoat-hinh", params: { country: "trung-quoc" }, keepCn: true, onlyCountry: "trung-quoc" },
   { id: "row-anime",       title: "Anime Hot",                      endpoint: "v1/api/danh-sach/hoat-hinh", params: { country: "nhat-ban" }, onlyCountry: "nhat-ban" },
   { id: "row-survival",    title: "Ranh giới sinh tồn",             endpoint: "v1/api/the-loai/vien-tuong" },
   { id: "row-thriller",    title: "Kinh dị giật gân",               endpoint: "v1/api/the-loai/kinh-di" },
   { id: "row-intense",     title: "Gay cấn đến phút chót",          endpoint: "v1/api/the-loai/hanh-dong" },
-  { id: "row-vn",          title: "Phim Bộ Việt Nam Đặc Sắc",       endpoint: "v1/api/danh-sach/phim-bo", params: { country: "viet-nam" } }
+  { id: "row-vn",          title: "Nhật Thy anh yêu em",       endpoint: "v1/api/danh-sach/phim-bo", params: { country: "viet-nam" } }
 ];
 
 // ===== Trạng thái =====
@@ -211,7 +213,7 @@ async function fetchMoviesData(category, page = 1) {
   } else if (/^(the-loai|quoc-gia)\/[\w-]+$/.test(category)) {
     endpoint = `v1/api/${category}`;
   }
-  return fetchList(endpoint, { page });
+  return fetchList(endpoint, { page, limit: GRID_LIMIT });
 }
 
 async function searchMoviesAPI(keyword, limit = 20) {
@@ -324,10 +326,16 @@ function renderSkeletonCards(count = 8) {
 }
 
 // ===== Giao diện: Lưới =====
-function renderMoviesGridUI(movies, emptyMsg = "Không tìm thấy bộ phim nào!") {
+let lastGrid = null;
+function renderMoviesGridUI(movies, emptyMsg = "Không tìm thấy bộ phim nào!", fillRows = false) {
   const container = $("rows");
   if (!container) return;
+  lastGrid = { movies, emptyMsg, fillRows };
   container.className = "movies-grid";
+  if (fillRows && Array.isArray(movies)) { // cắt cho đủ hàng, hàng cuối không bị hụt
+    const cols = getComputedStyle(container).gridTemplateColumns.split(" ").filter(Boolean).length;
+    if (cols > 1 && movies.length >= cols) movies = movies.slice(0, movies.length - (movies.length % cols));
+  }
   if (!Array.isArray(movies) || movies.length === 0) {
     container.innerHTML = `<p style='color: white; text-align: center; grid-column: 1/-1; padding: 40px 0;'>${escapeHtml(emptyMsg)}</p>`;
     return;
@@ -428,9 +436,9 @@ function renderPaginationUI(currentPage, totalPages = null) {
 
   const isLast = totalPages ? currentPage >= totalPages : false;
   paginationDiv.innerHTML = `
-    <button id="btn-prev" ${currentPage <= 1 ? "disabled" : ""}>Trang trước</button>
+    <button id="btn-prev" class="pg-btn" aria-label="Trang trước" ${currentPage <= 1 ? "disabled" : ""}>❮</button>
     <span style="color: white; font-weight: bold; margin: 0 15px;">Trang ${currentPage}${totalPages ? " / " + totalPages : ""}</span>
-    <button id="btn-next" ${isLast ? "disabled" : ""}>Trang sau</button>
+    <button id="btn-next" class="pg-btn" aria-label="Trang sau" ${isLast ? "disabled" : ""}>❯</button>
   `;
 
   $("btn-prev").onclick = () => handlePageChange(currentPage - 1);
@@ -520,7 +528,7 @@ window.loadData = async function (category = currentCategory, page = pageIndex) 
     if (category !== "hoat-hinh") result.items = await withoutCnAnimation(result.items);
     if (token !== loadToken) return;
 
-    renderMoviesGridUI(result.items);
+    renderMoviesGridUI(result.items, undefined, true);
     renderPaginationUI(page, getTotalPages(result.pagination));
   } catch (err) {
     console.error("Lỗi khi tải dữ liệu:", err);
@@ -956,6 +964,16 @@ function init() {
   try { initAccountUI(); } catch (err) { console.error("Lỗi khởi tạo giao diện tài khoản:", err); }
   const shared = new URLSearchParams(location.search).get("phim"); // liên kết chia sẻ ?phim=<slug>
   if (shared) handleWatchMovie(shared);
+
+  // Đổi kích thước cửa sổ: số cột đổi nên dàn lại cho đủ hàng
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      const c = $("rows");
+      if (lastGrid?.fillRows && c?.classList.contains("movies-grid") && c.children.length) renderMoviesGridUI(lastGrid.movies, lastGrid.emptyMsg, true);
+    }, 200);
+  });
 
   const searchInput = $("search");
   if (searchInput) {
